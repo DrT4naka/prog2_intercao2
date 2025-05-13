@@ -3,9 +3,9 @@
  * Armazena a medição dos sinais vitais de um paciente e a data e hora da mesma.
  */
 public class MedicaoPaciente {
-    private final double fc;
-    private final double temp;
-    private final double sat;
+    private double fc;
+    private double temp;
+    private double sat;
     private final String dataHora;
 
     /**
@@ -49,4 +49,10 @@ public class MedicaoPaciente {
     public String getDataHora() {
         return dataHora;
     }
+
+    public void aplicarVariacao(double percentagem) {
+    this.fc = this.fc * (1 + percentagem / 100);
+    this.temp = this.temp * (1 + percentagem / 100);
+    this.sat = this.sat * (1 + percentagem / 100);
+}
 }

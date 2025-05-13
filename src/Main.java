@@ -25,49 +25,86 @@ public class Main {
     /**
      * Inicia o programa e carrega os dados iniciais.
      *
-     * @param args Argumentos da linha de comando (não é utilizado)
-     * @throws IOException Se ocorrer um erro de I/O
-     * @throws ParseException Se ocorrer um erro ao parsear datas
+     * @param args
+     * @throws IOException
+     * @throws ParseException
      */
     public static void main(String[] args) throws IOException, ParseException {
         registarProfissional();
         gerarPacientesAutomaticamente();
-        mostrarOpcoes();
-        while (opcao != 7) {
+
+        do {
             mostrarOpcoes();
-        }
+        } while (opcao != 7);
     }
 
     /**
-     * Regista um profissional de saúde no sistema.
-     * Permite utilizar um profissional de saúde previamente cadastrado ou cadastrar um novo.
+     * Regista o profissional de saúde utilizando um profissional já autenticado ou inserindo um novo profissional.
      */
     private static void registarProfissional() {
-        System.out.println("Escolha uma das opções:\n1. Continuar com o perfil do profissional de saúde já cadastrado.\n2. Alterar perfil de acesso.");
-        opcao = sc.nextInt();
-        if (opcao == 1) { //profissional de saúde criado automaticamente
+        int opcao = -1;
+        
+        while (true) {
+            System.out.println("Escolha uma das opções:");
+            System.out.println("1. Continuar com o perfil do profissional de saúde já cadastrado.");
+            System.out.println("2. Alterar perfil de acesso.");
+            
+            if (sc.hasNextInt()) {
+                opcao = sc.nextInt();
+                sc.nextLine(); // limpar o buffer
+                if (opcao == 1 || opcao == 2) {
+                    break; // valor válido
+                } else {
+                    System.out.println("Valor inválido. Por favor, escolha 1 ou 2.");
+                }
+            } else {
+                System.out.println("Entrada inválida. Insira um número.");
+                sc.nextLine(); // limpar entrada inválida
+            }
+        }
+        
+        if (opcao == 1) { 
             ProfissionalSaude ps1 = new ProfissionalSaude("Dr. Filipe Almeida", "12/05/1988", 55894, "Cardiologista");
             profissinais.add(ps1);
         } else if (opcao == 2) {
-            // input dos dados do profissional de saúde
             System.out.println("Nome:");
-            nome = sc.next();
-            System.out.println("Data de Nascimento:");
-            dataNascimento = sc.next();
-            System.out.println("Codigo:");
-            codigo = sc.nextInt();
+            String nome = sc.nextLine();
+            
+            String dataNascimento;
+            while (true) {
+                System.out.println("Data de Nascimento (DD/MM/AAAA):");
+                dataNascimento = sc.nextLine();
+                if (dataNascimento.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                    break;
+                } else {
+                    System.out.println("Formato inválido! Use DD/MM/AAAA.");
+                }
+            }
+            
+            int codigo = -1;
+            while (true) {
+                System.out.println("Código:");
+                if (sc.hasNextInt()) {
+                    codigo = sc.nextInt();
+                    sc.nextLine(); // limpar o buffer
+                    break;
+                } else {
+                    System.out.println("Código inválido. Insira um número.");
+                    sc.nextLine(); // limpar entrada inválida
+                }
+            }
+            
             System.out.println("Profissão:");
-            String prof = sc.next();
+            String prof = sc.nextLine();
+            
             ProfissionalSaude ps1 = new ProfissionalSaude(nome, dataNascimento, codigo, prof);
             profissinais.add(ps1);
-        } else {
-            System.out.println("Valor inválido.");
         }
     }
 
     /**
-     * Gera automaticamente pacientes para demonstração.
-     * Cria 4 pacientes com medições iniciais, sem a necessidade de input de dados.
+     * Cria pacientes exemplo com medições pré-definidas.
+     * Usado para demonstração e testes.
      */
     private static void gerarPacientesAutomaticamente() {
         Paciente p1 = new Paciente("João Silva", "1990/05/12", 12345);
@@ -90,10 +127,10 @@ public class Main {
     }
 
     /**
-     * Exibe o menu de opções e executa as opções conforme a opção escolhida pelo utilizador.
+     * Mostra o menu de opções e executa as opções conforme o que o utilizador escolher.
      *
-     * @throws IOException Se ocorrer um erro de input/output
-     * @throws ParseException Se ocorrer um erro de date parsing
+     * @throws IOException    caso exista um erro de input/output
+     * @throws ParseException caso exista um erro de date parsing
      */
     private static void mostrarOpcoes() throws IOException, ParseException {
         System.out.println("\nEscolha uma das opções:");
@@ -133,11 +170,9 @@ public class Main {
     }
 
     /**
-     * Adiciona um novo paciente ao sistema com as suas medições iniciais.
-     * Solicita informações básicas e as medições iniciais.
+     * Adiciona um paciente ao sistema com as suas medições iniciais.
      */
     private static void adicionarPaciente() {
-        // input dos dados e medições do paciente
         System.out.print("Nome: ");
         String nome = sc.nextLine();
         System.out.print("Data de Nascimento (YYYY/MM/DD): ");
@@ -151,7 +186,7 @@ public class Main {
         System.out.print("Saturação de Oxigénio: ");
         double sat = sc.nextDouble();
         sc.nextLine();
-        SimpleDateFormat DataHora = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // registo da hora da medição
+        SimpleDateFormat DataHora = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // registo da hora
         String dataHora = DataHora.format(new Date());
 
         Paciente novoPaciente = new Paciente(nome, dataNascimento, codigo);
@@ -162,14 +197,13 @@ public class Main {
 
     /**
      * Adiciona novas medições a um paciente existente.
-     * Verifica se o código do paciente existe antes de adicionar.
      */
     private static void adicionarMedicao() {
         boolean codigoEncontrado = false;
         System.out.print("Código do paciente: ");
         int codigo = sc.nextInt();
         sc.nextLine();
-        // Verificação se o código do paciente já existe no sistema
+
         for (Paciente p : pacientes) {
             if (p.getCodigo() == codigo) {
                 codigoEncontrado = true;
@@ -190,8 +224,7 @@ public class Main {
     }
 
     /**
-     * Lista todos os pacientes ordenados alfabeticamente pelo nome.
-     * Exibe o nome e a classificação atual de cada paciente.
+     * Lista pacientes ordenados por ordem alfabética.
      */
     private static void listarPacientesPorNome() {
         pacientes.sort(Comparator.comparing(Paciente::getNome)); // Ordenar lista utilizando interface nativa
@@ -202,8 +235,7 @@ public class Main {
     }
 
     /**
-     * Lista pacientes ordenados conforme a data de nascimento.
-     * Exibe o nome e classificação atual de cada paciente.
+     * Lista pacientes ordenados de acordo com a data de nascimento.
      */
     private static void listarPacientesPorData() {
         pacientes.sort(Comparator.comparing(Paciente::getDataNascimento)); // Ordenar lista utilizando interface nativa
@@ -215,9 +247,8 @@ public class Main {
 
     /**
      * Calcula e mostra medidas sumário dos sinais vitais dos pacientes.
-     * Pode ser calculado para todos os pacientes, um grupo de pacientes ou num dado período.
      *
-     * @throws ParseException Caso ocorra um erro de date parsing
+     * @throws ParseException Caso exista um erro de date parsing
      */
     private static void calcularMedidasSumario() throws ParseException {
         int n = 0;
@@ -234,7 +265,7 @@ public class Main {
                     double fc = med.getFc();
                     double temp = med.getTemp();
                     double sat = med.getSat();
-                    calcularMaxMinSoma(fc, temp, sat);
+                    calcularMaxMinMedia(fc, temp, sat);
                 }
             }
             for (Paciente p : pacientes) {
@@ -263,7 +294,7 @@ public class Main {
                         double temp = med.getTemp();
                         double sat = med.getSat();
 
-                        calcularMaxMinSoma(fc, temp, sat);
+                        calcularMaxMinMedia(fc, temp, sat);
                         n++;
                     }
                 } else {
@@ -289,7 +320,7 @@ public class Main {
                         double temp = med.getTemp();
                         double sat = med.getSat();
 
-                        calcularMaxMinSoma(fc, temp, sat);
+                        calcularMaxMinMedia(fc, temp, sat);
                         n++;
                     }
                 }
@@ -311,22 +342,21 @@ public class Main {
     }
 
     /**
-     * Calcula valores mínimos, máximos e somas para o futuro cálculo de medidas sumário.
+     * Método utilizado para calcular mínimo, máximo e média de cada variável, sem ocorrer repetição do código no método onde este é chamado.
      *
      * @param fc Frequência cardíaca
      * @param temp Temperatura corporal
      * @param sat Saturação de oxigénio
      */
-    private static void calcularMaxMinSoma (double fc, double temp, double sat) {
-        // Soma de todos os valores de cada variável.
+    private static void calcularMaxMinMedia(double fc, double temp, double sat) {
         somaFC = somaFC + fc;
         somaTemp = somaTemp + temp;
         somaSat = somaSat + sat;
-        // Soma dos quadrados dos valores de cada variável para o cálculo do desvio padrão.
+
         somaFC2 = somaFC2 + fc * fc;
         somaTemp2 = somaTemp2 + temp * temp;
         somaSat2 = somaSat2 + sat * sat;
-        // Determinação de máximos e mínimos de cada variável.
+
         minFC = Math.min(minFC, fc);
         maxFC = Math.max(maxFC, fc);
         minTemp = Math.min(minTemp, temp);
@@ -336,8 +366,7 @@ public class Main {
     }
 
     /**
-     * Exibe a classificação atual de todos os pacientes.
-     * Mostra código de identificação, nome e classificação em formato tabular.
+     * Mostra a classificação atual de cada paciente.
      */
     private static void visualizarAvaliacoes() {
         System.out.printf("\n%-8s  %-20s  %-12s \n", "Código:", "Nome:", "Classificação:");
@@ -347,17 +376,15 @@ public class Main {
     }
 
     /**
-     * Cria um arquivo de texto com todos os registos do sistema.
-     * Inclui informações dos profissionais e pacientes com as suas medições.
-     * @throws IOException Se ocorrer um erro ao criar o arquivo
+     * Cria um ficheiro de texto com o registo os dados de todos os pacientes, assim como a identificação do profissional que inseriu as medições.
+     *
+     * @throws IOException
      */
     private static void criarFicheiroRegisto() throws IOException {
-        // Criar o ficheiro
         System.out.println("Pathname do ficheiro de registo:");
         String pathname = sc.nextLine();
         File registo = new File(pathname);
         registo.createNewFile();
-        // Escrever no ficheiro
         Formatter out = new Formatter(registo);
         for (ProfissionalSaude ps : profissinais) {
             out.format("%s%n", ps.toString());
@@ -368,4 +395,18 @@ public class Main {
         out.close();
         System.out.println("Ficheiro criado.");
     }
+
+    public static double calcularPercentagemCriticos(List<Paciente> pacientes) {
+    int criticos = 0, total = 0;
+    for (Paciente p : pacientes) {
+        for (MedicaoPaciente m : p.getMedicoes()) {
+            if (p.classificarPaciente().equals("Crítico")) {
+                criticos++;
+                break;
+            }
+        }
+        total++;
+    }
+    return 100.0 * criticos / total;
+}
 }
